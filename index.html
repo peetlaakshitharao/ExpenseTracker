@@ -6,15 +6,69 @@
   <title>Login - Expense Tracker</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    .login-body {
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
       background-image: url('pic.jpg');
       background-size: cover;
       background-repeat: no-repeat;
       background-position: center;
     }
+
+    .login-container {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 40px 30px;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      text-align: center;
+      backdrop-filter: blur(5px);
+    }
+
+    .login-container h1 {
+      margin-bottom: 20px;
+      color: #e76f51;
+    }
+
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .login-form input {
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 16px;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    .login-form input:focus {
+      border-color: #e76f51;
+    }
+
+    .login-form button {
+      padding: 12px;
+      background: #e76f51;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .login-form button:hover {
+      background: #d35b3d;
+    }
   </style>
 </head>
-<body class="login-body">
+<body>
   <div class="login-container">
     <h1>Expense Tracker</h1>
     <form class="login-form" onsubmit="login(event)">
@@ -27,15 +81,13 @@
   <script>
     function login(event) {
       event.preventDefault();
-      // You can add real auth logic here
-      const username = document.getElementById("username").value;
-      const password = document.getElementById("password").value;
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
 
       if (username && password) {
-        // Save login state if needed
         window.location.href = "tracker.html";
       } else {
-        alert("Please fill all fields");
+        alert("Please fill all fields.");
       }
     }
   </script>
