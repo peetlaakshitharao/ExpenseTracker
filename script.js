@@ -1,6 +1,6 @@
 const amountInput = document.getElementById('amount');
 const typeSelect = document.getElementById('transaction-type');
-const transactionInput = document.getElementById('transaction');
+const descInput = document.getElementById('transaction');
 const dateInput = document.getElementById('date');
 const addBtn = document.getElementById('add-btn');
 const transactionsBody = document.getElementById('transactions-body');
@@ -9,70 +9,73 @@ const totalIncomeEl = document.getElementById('total-income');
 const totalExpenseEl = document.getElementById('total-expense');
 const balanceEl = document.getElementById('balance');
 
-let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+let transactions = [];
 
 function updateSummary() {
-  let income = 0;
-  let expense = 0;
+  const income = transactions
+    .filter(tx => tx.type === "Income")
+    .reduce((acc, tx) => acc + tx.amount, 0);
 
-  transactions.forEach(t => {
-    if (t.type === 'Income') {
-      income += t.amount;
-    } else if (t.type === 'Expense') {
-      expense += t.amount;
-    }
-  });
+  const expense = transactions
+    .filter(tx => tx.type === "Expense")
+    .reduce((acc, tx) => acc + tx.amount, 0);
+
+  const balance = income - expense;
 
   totalIncomeEl.textContent = `₹${income}`;
   totalExpenseEl.textContent = `₹${expense}`;
-  balanceEl.textContent = `₹${income - expense}`;
+  balanceEl.textContent = `₹${balance}`;
 }
 
 function renderTransactions() {
-  transactionsBody.innerHTML = '';
-  transactions.forEach((t, index) => {
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td>₹${t.amount}</td>
-      <td>${t.type}</td>
-      <td>${t.description}</td>
-      <td>${t.date}</td>
-      <td><button onclick="deleteTransaction(${index})">Delete</button></td>
+  transactionsBody.innerHTML = "";
+  transactions.forEach((tx, index) => {
+    const tr = document.createElement("tr");
+
+    tr.innerHTML = `
+      <td>₹${tx.amount}</td>
+      <td>${tx.type}</td>
+      <td>${tx.date}</td>
+      <td><button onclick="deleteTransaction(${index})" style="background: #E76F51; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">Delete</button></td>
     `;
-    transactionsBody.appendChild(row);
+
+    transactionsBody.appendChild(tr);
   });
+}
+
+function addTransaction() {
+  const amount = parseFloat(amountInput.value);
+  const type = typeSelect.value;
+  const desc = descInput.value;
+  const date = dateInput.value;
+
+  if (!amount || !type || !desc || !date) {
+    alert("Please fill in all fields.");
+    return;
+  }
+
+  const newTransaction = {
+    amount,
+    type,
+    desc,
+    date,
+  };
+
+  transactions.push(newTransaction);
+  renderTransactions();
   updateSummary();
+
+  // Clear inputs
+  amountInput.value = "";
+  typeSelect.value = "";
+  descInput.value = "";
+  dateInput.value = "";
 }
 
 function deleteTransaction(index) {
   transactions.splice(index, 1);
-  saveAndRender();
-}
-
-function saveAndRender() {
-  localStorage.setItem('transactions', JSON.stringify(transactions));
   renderTransactions();
+  updateSummary();
 }
 
-if (addBtn) {
-  addBtn.addEventListener('click', () => {
-    const amount = parseFloat(amountInput.value);
-    const type = typeSelect.value;
-    const description = transactionInput.value;
-    const date = dateInput.value;
-
-    if (!amount || !type || !description || !date) {
-      alert('Please fill all fields');
-      return;
-    }
-
-    transactions.push({ amount, type, description, date });
-    saveAndRender();
-
-    amountInput.value = '';
-    typeSelect.value = '';
-    transactionInput.value = '';
-    dateInput.value = '';
-  });
-  renderTransactions();
-}
+addBtn.addEventListener("click", addTransaction);
